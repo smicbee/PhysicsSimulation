@@ -9,7 +9,7 @@ Public Class UpdateRenderEventArgs
     Public outrender As Bitmap
 End Class
 
-Class Simulation
+Public Class Simulation
     Public Shared objectcounterid As Integer = -1
     Public Shared Function getcounter() As Integer
         Simulation.objectcounterid += 1
