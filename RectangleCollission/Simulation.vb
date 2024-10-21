@@ -2,6 +2,9 @@
 
 Imports System.ComponentModel
 Imports System.Drawing.Imaging
+Imports System.Runtime.InteropServices
+
+
 
 
 Public Class UpdateRenderEventArgs
@@ -15,6 +18,14 @@ Public Class LiveTimeExpiredEventArgs
 End Class
 
 Public Class Simulation
+
+    <DllImport("gdi32.dll")>
+    Public Shared Function BitBlt(ByVal hdcDest As IntPtr, ByVal nXDest As Integer, ByVal nYDest As Integer, ByVal nWidth As Integer, ByVal nHeight As Integer, ByVal hdcSrc As IntPtr, ByVal nXSrc As Integer, ByVal nYSrc As Integer, ByVal dwRop As Integer) As Boolean
+
+    End Function
+
+
+
     Public Shared objectcounterid As Integer = -1
     Public backgroundcolor As Color = Color.White
 
@@ -374,13 +385,16 @@ Public Class Simulation
     Dim objstoremove As New List(Of PhysObj)
     Dim objstoadd As New List(Of PhysObj)
 
+
+
+
     Sub render_next_frame(sender As Object, e As DoWorkEventArgs)
         Dim outrender As New Bitmap(windowsize.Width, windowsize.Height)
         Dim g As Graphics = Graphics.FromImage(outrender)
         Dim bck As BackgroundWorker = sender
         Dim fpscalc As New Stopwatch
         Dim effectivefps As New Stopwatch
-  
+
 
         While True
             Dim addlistdup As New List(Of PhysObj)
@@ -441,7 +455,20 @@ Public Class Simulation
                 If obj.img IsNot Nothing Then
                     Dim framedimensions As Imaging.FrameDimension = New FrameDimension(obj.img.FrameDimensionsList(0))
                     obj.img.SelectActiveFrame(framedimensions, ellapsedticks Mod obj.img.GetFrameCount(framedimensions))
-                    g.DrawImage(obj.img, obj.position)
+                    Dim pt As New Point(obj.position.X, obj.position.Y)
+
+                    'BitBlt implementation
+                    Dim hdcDest As IntPtr = g.GetHdc
+                    Dim s As Graphics = Graphics.FromImage(obj.img)
+                    Dim hdcSource As IntPtr = s.GetHdc
+
+                    BitBlt(hdcDest, 0, 0, obj.img.Width, obj.img.Height, hdcSource, 0, 0, &HCC0020)
+
+                    s.ReleaseHdc()
+                    g.ReleaseHdc()
+                    s.Dispose()
+
+                    'g.DrawImageUnscaled(obj.img, pt)
                 End If
 
                 g.FillRectangle(New SolidBrush(obj.fillcolor), obj.position)
