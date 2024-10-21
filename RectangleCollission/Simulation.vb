@@ -380,7 +380,7 @@ Public Class Simulation
         Dim bck As BackgroundWorker = sender
         Dim fpscalc As New Stopwatch
         Dim effectivefps As New Stopwatch
-
+  
 
         While True
             Dim addlistdup As New List(Of PhysObj)
@@ -453,9 +453,10 @@ Public Class Simulation
 
             fpscalc.Stop()
 
-            Dim newrender = outrender
+            Dim newrender As Bitmap = outrender.Clone
 
             bck.ReportProgress(99, newrender)
+
 
             Dim mstowait As Decimal = ((1000 / FPS) - fpscalc.ElapsedMilliseconds)
 
@@ -529,6 +530,8 @@ Public Class Simulation
         End If
 
         outrender = render.Clone
+
+        render.Dispose()
 
         Dim ev As New UpdateRenderEventArgs
         ev.outrender = outrender
