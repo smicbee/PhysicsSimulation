@@ -55,7 +55,10 @@ Public Class Simulation
 
 
     Class PhysObj
+        Public Sub Dispose()
+            img.Dispose()
 
+        End Sub
         Public Sub New(position As RectangleF, movementspeed As PointF, Optional charge As Decimal = 0, Optional mass As Decimal = 1, Optional does_move As Boolean = True, Optional bouncyness As Decimal = 1, Optional img As Image = Nothing, Optional imggif_FPS As Integer = 0, Optional despawntime As DateTime = Nothing)
             Me.position = position
             Dim pencolor As Color
@@ -390,6 +393,7 @@ Public Class Simulation
 
             For Each obj In objstoremove
                 collisionobjects.Remove(obj)
+                obj.Dispose()
             Next
             objstoremove.Clear()
 
@@ -449,7 +453,7 @@ Public Class Simulation
 
             fpscalc.Stop()
 
-            Dim newrender = outrender.Clone
+            Dim newrender = outrender
 
             bck.ReportProgress(99, newrender)
 
