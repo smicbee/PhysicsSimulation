@@ -419,7 +419,7 @@ Public Class Simulation
         Dim bck As BackgroundWorker = sender
         Dim fpscalc As New Stopwatch
         Dim effectivefps As New Stopwatch
-
+        Dim backgroundbrush As New SolidBrush(backgroundcolor)
 
         While True
             Dim addlistdup As New List(Of PhysObj)
@@ -443,10 +443,12 @@ Public Class Simulation
             effectivefps.Start()
             fpscalc.Start()
 
-            g.Clear(backgroundcolor)
+            'g.Clear(backgroundcolor)
 
 
             For Each obj In collisionobjects
+                g.FillRectangle(backgroundbrush, obj.position)
+
                 apply_despawning(obj, now)
                 apply_friction(obj)
                 apply_gravity(obj)
