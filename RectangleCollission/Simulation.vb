@@ -48,6 +48,8 @@ Public Class Simulation
 
     Public Shared objectcounterid As Integer = -1
     Public backgroundcolor As Color = Color.White
+    Public hardwareacceleratedrendering As Boolean = True
+
 
     Public Shared Function getcounter() As Integer
         Simulation.objectcounterid += 1
@@ -75,7 +77,7 @@ Public Class Simulation
     Dim ellapsedticks As Integer = 0
     Dim FPS As Integer = 30
     Dim windowsize As Size
-    Public hardwareacceleratedrendering As Boolean = True
+
     Dim gravity As PointF = New PointF(0.1, 0.0)
     'Dim gravity As PointF = New PointF(0, 0)
     Dim friction As PointF = New PointF(0.01, 0.01)
@@ -120,6 +122,11 @@ Public Class Simulation
             Me.fillcolor = pencolor
             Me.border = New Pen(bordercolor, 2)
             Me.img = img
+
+            If Me.img IsNot Nothing Then
+                Me.hbitmap = Me.img.GetHbitmap
+            End If
+
             Me.speed = movementspeed
             Me.id = getcounter()
             Me.charge = charge
@@ -133,6 +140,7 @@ Public Class Simulation
 
         Public gifFPS As Integer
         Public img As Bitmap
+        Public hbitmap As IntPtr
         Public activegifframe As Integer
         Public bouncyness As Decimal
         Public does_move As Boolean
@@ -411,6 +419,7 @@ Public Class Simulation
 
     Sub render_next_frame(sender As Object, e As DoWorkEventArgs)
         Dim outrender As New Bitmap(windowsize.Width, windowsize.Height, Imaging.PixelFormat.Format32bppArgb)
+        Dim destHB = outrender.GetHbitmap
         Dim g As Graphics = Graphics.FromImage(outrender)
         Dim bck As BackgroundWorker = sender
         Dim fpscalc As New Stopwatch
@@ -486,14 +495,14 @@ Public Class Simulation
 
                         Dim hdcDest As IntPtr = g.GetHdc
                         Dim comphdcDest As IntPtr = CreateCompatibleDC(hdcDest)
-                        Dim destHB = outrender.GetHbitmap
+
                         Dim oldDest = SelectObject(comphdcDest, destHB)
 
 
                         Dim s As Graphics = Graphics.FromImage(obj.img)
                         Dim hdcSource As IntPtr = s.GetHdc
                         Dim comphdcSource As IntPtr = CreateCompatibleDC(hdcSource)
-                        Dim sourceHB = obj.img.GetHbitmap
+                        Dim sourceHB = obj.hbitmap
                         Dim oldSource = SelectObject(comphdcSource, sourceHB)
 
 
@@ -507,7 +516,7 @@ Public Class Simulation
                         DeleteObject(comphdcDest)
                         DeleteObject(comphdcSource)
 
-                        DeleteObject(destHB)
+                        'DeleteObject(destHB)
                         DeleteObject(sourceHB)
 
                         s.ReleaseHdc(hdcSource)
