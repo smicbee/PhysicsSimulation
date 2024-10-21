@@ -24,6 +24,26 @@ Public Class Simulation
 
     End Function
 
+    <DllImport("gdi32.dll")>
+    Public Shared Function CreateCompatibleDC(ByVal hdc As IntPtr) As IntPtr
+
+    End Function
+
+    <DllImport("gdi32.dll")>
+    Public Shared Function CreateCompatibleBitmap(ByVal hdc As IntPtr, ByVal width As Integer, ByVal height As Integer) As IntPtr
+
+    End Function
+
+
+    <DllImport("gdi32.dll")>
+    Public Shared Function SelectObject(ByVal hdc As IntPtr, ByVal hgdiobj As IntPtr) As IntPtr
+
+    End Function
+
+    <DllImport("gdi32.dll")>
+    Public Shared Sub DeleteObject(ByVal hdc As IntPtr)
+
+    End Sub
 
 
     Public Shared objectcounterid As Integer = -1
@@ -54,7 +74,7 @@ Public Class Simulation
     Dim ellapsedticks As Integer = 0
     Dim FPS As Integer = 30
     Dim windowsize As Size
-
+    Public hardwareacceleratedrendering As Boolean = True
     Dim gravity As PointF = New PointF(0.1, 0.0)
     'Dim gravity As PointF = New PointF(0, 0)
     Dim friction As PointF = New PointF(0.01, 0.01)
@@ -111,7 +131,7 @@ Public Class Simulation
         End Sub
 
         Public gifFPS As Integer
-        Public img As Image
+        Public img As Bitmap
         Public activegifframe As Integer
         Public bouncyness As Decimal
         Public does_move As Boolean
@@ -176,13 +196,13 @@ Public Class Simulation
 
     Public Function ChristmasGIF(offsetpt As Point, Optional ByVal scale As Decimal = 1) As CompositeObjekt
 
-        Dim gif As Image = Image.FromFile("B:\Google Drive\Desktop\christmas-holiday.gif")
+        Dim gif As Image = Image.FromFile("C:\Users\beetz\Desktop\image001.gif")
 
 
         Dim singularitypos As New Rectangle(offsetpt.X, offsetpt.Y, gif.Width * scale, gif.Height * scale)
 
         Dim singularity As New PhysObj(singularitypos, Nothing, 0, 100, img:=gif)
-        singularity.border = Nothing
+        singularity.border = New Pen(Color.Black, 3)
 
         Dim returnobj As CompositeObjekt = New CompositeObjekt({singularity})
 
@@ -389,7 +409,7 @@ Public Class Simulation
 
 
     Sub render_next_frame(sender As Object, e As DoWorkEventArgs)
-        Dim outrender As New Bitmap(windowsize.Width, windowsize.Height)
+        Dim outrender As New Bitmap(windowsize.Width, windowsize.Height, Imaging.PixelFormat.Format32bppArgb)
         Dim g As Graphics = Graphics.FromImage(outrender)
         Dim bck As BackgroundWorker = sender
         Dim fpscalc As New Stopwatch
@@ -457,18 +477,48 @@ Public Class Simulation
                     obj.img.SelectActiveFrame(framedimensions, ellapsedticks Mod obj.img.GetFrameCount(framedimensions))
                     Dim pt As New Point(obj.position.X, obj.position.Y)
 
-                    'BitBlt implementation
-                    Dim hdcDest As IntPtr = g.GetHdc
-                    Dim s As Graphics = Graphics.FromImage(obj.img)
-                    Dim hdcSource As IntPtr = s.GetHdc
+                    If hardwareacceleratedrendering Then
 
-                    BitBlt(hdcDest, 0, 0, obj.img.Width, obj.img.Height, hdcSource, 0, 0, &HCC0020)
 
-                    s.ReleaseHdc()
-                    g.ReleaseHdc()
-                    s.Dispose()
+                        'BitBlt implementation
 
-                    'g.DrawImageUnscaled(obj.img, pt)
+
+                        Dim hdcDest As IntPtr = g.GetHdc
+                        Dim comphdcDest As IntPtr = CreateCompatibleDC(hdcDest)
+                        Dim destHB = outrender.GetHbitmap
+                        Dim oldDest = SelectObject(comphdcDest, destHB)
+
+
+                        Dim s As Graphics = Graphics.FromImage(obj.img)
+                        Dim hdcSource As IntPtr = s.GetHdc
+                        Dim comphdcSource As IntPtr = CreateCompatibleDC(hdcSource)
+                        Dim sourceHB = obj.img.GetHbitmap
+                        Dim oldSource = SelectObject(comphdcSource, sourceHB)
+
+
+                        Dim targetpt As Point = New Point(Math.Round(obj.position.X), Math.Round(obj.position.Y))
+
+                        BitBlt(hdcDest, targetpt.X, targetpt.Y, obj.img.Width, obj.img.Height, comphdcSource, 0, 0, &HCC0020)
+
+                        SelectObject(comphdcDest, oldDest)
+                        SelectObject(comphdcSource, oldSource)
+
+                        DeleteObject(comphdcDest)
+                        DeleteObject(comphdcSource)
+
+                        DeleteObject(destHB)
+                        DeleteObject(sourceHB)
+
+                        s.ReleaseHdc(hdcSource)
+                        g.ReleaseHdc(hdcDest)
+                        s.Dispose()
+
+
+
+                    Else
+                        g.DrawImageUnscaled(obj.img, pt)
+                    End If
+
                 End If
 
                 g.FillRectangle(New SolidBrush(obj.fillcolor), obj.position)
@@ -655,7 +705,14 @@ retry:
 retry:
             Dim pos As New Rectangle(Rnd() * windowsize.Width, Rnd() * windowsize.Height, Rnd() * 200 + 20, Rnd() * 200 + 20)
 
-            Dim newobj As New PhysObj(pos, Nothing, 0, 100, True, 0.6)
+            Dim img As Image = Image.FromFile("C:\Users\beetz\Desktop\series.png")
+            Dim bmp As Bitmap = New Bitmap(pos.Width, pos.Height, PixelFormat.Format32bppArgb)
+            Dim g As Graphics = Graphics.FromImage(bmp)
+            g.DrawImage(img, 0, 0, pos.Width, pos.Height)
+            g.Dispose()
+
+
+            Dim newobj As New PhysObj(pos, Nothing, 0, 100, True, 0.6, bmp)
 
             If collideswithanyotherobj(newobj).Count = 0 AndAlso collideswithwall_x(newobj) = False AndAlso collideswithwall_y(newobj) = False Then
                 objstoadd.Add(newobj)
