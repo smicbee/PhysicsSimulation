@@ -123,10 +123,6 @@ Public Class Simulation
             Me.border = New Pen(bordercolor, 2)
             Me.img = img
 
-            If Me.img IsNot Nothing Then
-                Me.hbitmap = Me.img.GetHbitmap
-            End If
-
             Me.speed = movementspeed
             Me.id = getcounter()
             Me.charge = charge
@@ -140,7 +136,6 @@ Public Class Simulation
 
         Public gifFPS As Integer
         Public img As Bitmap
-        Public hbitmap As IntPtr
         Public activegifframe As Integer
         Public bouncyness As Decimal
         Public does_move As Boolean
@@ -502,7 +497,7 @@ Public Class Simulation
                         Dim s As Graphics = Graphics.FromImage(obj.img)
                         Dim hdcSource As IntPtr = s.GetHdc
                         Dim comphdcSource As IntPtr = CreateCompatibleDC(hdcSource)
-                        Dim sourceHB = obj.hbitmap
+                        Dim sourceHB = obj.img.GetHbitmap
                         Dim oldSource = SelectObject(comphdcSource, sourceHB)
 
 
