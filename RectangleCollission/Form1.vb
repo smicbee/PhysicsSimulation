@@ -27,6 +27,9 @@ Public Class Form1
     Dim t As New Timer
 
 
+
+
+
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Randomize()
 
@@ -35,7 +38,7 @@ Public Class Form1
 
         Dim sim As New Simulation(New Drawing.Size(Me.ClientSize.Width, Me.ClientSize.Height))
         AddHandler sim.RenderUpdated, AddressOf update_render
-
+        'AddHandler sim.PhysObjLivetimeExpired, AddressOf livetimeexpired
         sim.Start()
 
 
