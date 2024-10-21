@@ -70,6 +70,7 @@ Public Class Simulation
         renderthread.RunWorkerAsync()
 
     End Sub
+
     Dim collisionobjects As New List(Of PhysObj)
     Dim ellapsedticks As Integer = 0
     Dim FPS As Integer = 30
