@@ -426,6 +426,9 @@ Public Class Simulation
         Dim effectivefps As New Stopwatch
         Dim backgroundbrush As New SolidBrush(backgroundcolor)
 
+        g.Clear(backgroundcolor)
+
+
         While True
             Dim addlistdup As New List(Of PhysObj)
             addlistdup = objstoadd.ToList
@@ -452,9 +455,11 @@ Public Class Simulation
 
 
             For Each obj In collisionobjects
+
                 Dim roundedrectangle As Rectangle = New Rectangle((obj.position.X) - 1, (obj.position.Y) - 1, (obj.position.Width) + 1, (obj.position.Height) + 1)
 
                 g.FillRectangle(backgroundbrush, roundedrectangle)
+
 
                 apply_despawning(obj, now)
                 apply_friction(obj)
@@ -481,7 +486,11 @@ Public Class Simulation
                     ResolveCollision(obj, collobj)
                 Next
 
+
                 roundedrectangle = New Rectangle((obj.position.X), (obj.position.Y), (obj.position.Width), (obj.position.Height))
+
+                Dim roundedrectangle = New Rectangle((obj.position.X), (obj.position.Y), (obj.position.Width), (obj.position.Height))
+
 
                 If obj.border IsNot Nothing Then
                     g.DrawRectangle(obj.border, roundedrectangle)
