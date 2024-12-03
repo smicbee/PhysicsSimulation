@@ -489,7 +489,6 @@ Public Class Simulation
 
                 roundedrectangle = New Rectangle((obj.position.X), (obj.position.Y), (obj.position.Width), (obj.position.Height))
 
-                Dim roundedrectangle = New Rectangle((obj.position.X), (obj.position.Y), (obj.position.Width), (obj.position.Height))
 
 
                 If obj.border IsNot Nothing Then
