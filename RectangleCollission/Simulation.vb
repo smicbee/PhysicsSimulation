@@ -3,7 +3,7 @@
 Imports System.ComponentModel
 Imports System.Drawing.Imaging
 Imports System.Runtime.InteropServices
-
+Imports unvell.D2DLib
 
 
 
@@ -413,7 +413,12 @@ Public Class Simulation
 
 
     Sub render_next_frame(sender As Object, e As DoWorkEventArgs)
+
+
+
         Dim outrender As New Bitmap(windowsize.Width, windowsize.Height, Imaging.PixelFormat.Format32bppArgb)
+
+
         Dim destHB = outrender.GetHbitmap
         Dim g As Graphics = Graphics.FromImage(outrender)
         Dim bck As BackgroundWorker = sender

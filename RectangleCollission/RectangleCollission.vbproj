@@ -69,6 +69,12 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="d2dlibexport, Version=1.5.0.0, Culture=neutral, PublicKeyToken=7afcd1746c161a40, processorArchitecture=AMD64">
+      <HintPath>..\..\packages\unvell.D2DLib-x64.1.5.0\lib\net462\d2dlibexport.dll</HintPath>
+    </Reference>
+    <Reference Include="d2dwinform, Version=1.5.0.0, Culture=neutral, PublicKeyToken=7afcd1746c161a40, processorArchitecture=AMD64">
+      <HintPath>..\..\packages\unvell.D2DLib-x64.1.5.0\lib\net462\d2dwinform.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
@@ -141,6 +147,7 @@
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
     <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>
